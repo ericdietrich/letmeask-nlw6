@@ -16,14 +16,11 @@ export const Home = () => {
   const history = useHistory();
 
 
-  function handleCreateRoom() {
-    if(!user) {
-      signInWithGoogle().then(()=> {
-        history.push('/rooms/new')
-      })
-    } else {
-      history.push('/rooms/new')
+  async function handleCreateRoom() {
+    if (!user) {
+      await signInWithGoogle()
     }
+    history.push('/rooms/new')
     
   }
 

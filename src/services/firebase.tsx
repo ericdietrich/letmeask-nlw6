@@ -1,6 +1,6 @@
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
 
 // Essa configuração vem do projeto criado no Firebase como Realtime Database
 const firebaseConfig = {

@@ -17,7 +17,8 @@ type AuthContextProviderProps = {
   children: ReactNode
 }
 
-export const AuthContext = createContext({} as AuthContextType)
+export const AuthContext = createContext({} as AuthContextType);
+
 export function AuthContextProvider (props: AuthContextProviderProps) {
 
   const [user, setUser] = useState<User>();
@@ -25,17 +26,18 @@ export function AuthContextProvider (props: AuthContextProviderProps) {
   useEffect(() => {
     //onAuthStateChanged é um evento que monitora se já existe um login feito anteriormente
     const unsubscribe = auth.onAuthStateChanged(user => {
-      if(user) {
-      const {displayName, photoURL, uid} = user
+      if (user) {
+        const {displayName, photoURL, uid} = user
 
-      if (!displayName || !photoURL) {
-        throw new Error('Missing information from Google Account.')
-      }
-      setUser({
-        id: uid,
-        name: displayName,
-        avatar: photoURL
-      })
+        if (!displayName || !photoURL) {
+          throw new Error('Missing information from Google Account.')
+        }
+
+        setUser({
+          id: uid,
+          name: displayName,
+          avatar: photoURL
+        })
       }
     })
     //esse retorno desliga o listener onAuthStateChanged para que ele não continue rodando em outras telas
@@ -43,7 +45,7 @@ export function AuthContextProvider (props: AuthContextProviderProps) {
     return () => {
       unsubscribe();
     }
-  }, [user])
+  }, [])
 
   const signInWithGoogle = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
