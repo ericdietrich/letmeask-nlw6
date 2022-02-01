@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import logoImg from '../assets/images/logo.svg';
 import { Button } from '../components/Button';
@@ -6,6 +6,27 @@ import { RoomCode } from '../components/RoomCode';
 import { useAuth } from '../hooks/useAuth';
 import { database } from '../services/firebase';
 import '../styles/room.scss'
+
+type FirebaseQuestions = Record<string, {
+  author: {
+    name: string,
+    avatar: string
+  },
+  content: string,
+  isAnswered: boolean,
+  isHighlighted: boolean
+}>
+
+type Question = {
+  id: string,
+  author: {
+    name: string,
+    avatar: string
+  },
+  content: string,
+  isAnswered: boolean,
+  isHighlighted: boolean
+} 
 
 type RoomParams = {
   id: string
@@ -16,6 +37,31 @@ type RoomParams = {
   const params = useParams<RoomParams>();
   const roomId = params.id;
   const [newQuestion, setNewQuestion] = useState('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [title, setTitle] = useState('')
+
+
+  useEffect(() => {
+      const  roomRef =  database.ref(`rooms/${roomId}`);
+
+      roomRef.on('value', room => {
+        const databaseRoom = room.val();
+        const databaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {};
+
+        const parsedQuestions = Object.entries(databaseQuestions).map(([key, value]) => {
+          return {
+            id: key,
+            content: value.content,
+            author: value.author,
+            isAnswered: value.isAnswered,
+            isHighlighted: value.isHighlighted
+          }
+        });
+        setQuestions(parsedQuestions);
+        setTitle(databaseRoom.title)
+      })
+  }, [roomId]);
+  
 
   async function handleSendQuestion(event: FormEvent) {
     event.preventDefault();
@@ -53,8 +99,8 @@ type RoomParams = {
 
       <main>
         <div className="room-title">
-          <h1>Sala React</h1>
-          <span>4 perguntas</span>
+          <h1>Sala {title}</h1>
+          {questions.length > 0 && <span>{questions.length} pergunta(s)</span>}
         </div>
     
         <form onSubmit={handleSendQuestion}>
@@ -75,6 +121,16 @@ type RoomParams = {
             <Button type='submit' disabled={!user}>Enviar pergunta</Button>
           </div>
         </form>
+
+        {questions && questions.map(question => {
+          return (<div className='question'>
+            <p>{question.content}</p>
+            <div>
+              <img src={question.author.avatar} alt="" />
+              <p>{question.author.name}</p>
+            </div>
+          </div>)
+        })}
       </main>
 
     </div>
