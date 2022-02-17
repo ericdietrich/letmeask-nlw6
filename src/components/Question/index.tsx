@@ -8,6 +8,8 @@ type QuestionProps= {
     name: string,
     avatar: string
   },
+  isAnswered?: boolean
+  isHighLighted?: boolean
   children?: ReactNode
 } 
 
@@ -15,6 +17,8 @@ type QuestionProps= {
 export function Question ({
   content,
   author,
+  isAnswered = false,
+  isHighLighted = false,
   children
 }: QuestionProps) {
   return (
